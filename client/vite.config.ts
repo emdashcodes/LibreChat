@@ -1,10 +1,9 @@
-import path, { resolve } from 'path';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
-import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import { compression } from 'vite-plugin-compression2';
+import path, { resolve } from 'path';
 import type { Plugin } from 'vite';
+import { createLogger, defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -89,10 +88,15 @@ export default defineConfig({
   build: {
     sourcemap: process.env.NODE_ENV === 'development',
     outDir: './dist',
-    minify: 'terser',
+    emptyOutDir: true,
+    cssCodeSplit: false,
+    manifest: true,
+    // Force clean builds
+    write: true,
+    modulePreload: {
+      polyfill: true
+    },
     rollupOptions: {
-      preserveEntrySignatures: 'strict',
-      // external: ['uuid'],
       output: {
         manualChunks(id: string) {
           if (id.includes('node_modules')) {
